@@ -4,7 +4,7 @@ if ! [ -x "$(command -v nvcc)" ]; then
     exit 1
 fi
 ###
-pip install cython
+pip install cython pyTelegramBotAPI
 ###
 pip install opencv-python numpy pandas scikit-image matplotlib h5py imgaug tensorflow-gpu==1.14 keras==2.2.5
 ###
