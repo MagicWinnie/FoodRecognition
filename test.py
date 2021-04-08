@@ -24,10 +24,10 @@ from mrcnn.model     import log
 from mrcnn.visualize import display_images
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--logs", type=str, default="logs", help="Default log dir")
-parser.add_a1rgument("--weights", type=str, required=True, help="Weights path")
-parser.add_argument("--val", type=bool, default=True, help="Whether to use photos from validation dataset or own picture")
-parser.add_argument("--path", type=str, required=True, help="Path to dataset or own picture")
+parser.add_argument("--logs",     type=str,  default="logs", help="Default log dir"                                              )
+parser.add_argument("--val",      type=bool, default=True,   help="Whether to use photos from validation dataset or own picture" )
+parser.add_argument("--weights",  type=str,  required=True,  help="Weights path"                                                 )
+parser.add_argument("--path",     type=str,  required=True,  help="Path to dataset or own picture"                               )
 args = parser.parse_args()
 
 WEIGHTS_PATH = args.weights

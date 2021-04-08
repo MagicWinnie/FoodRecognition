@@ -12,12 +12,12 @@ from mrcnn.model     import MaskRCNN
 from mrcnn           import model as modellib
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--train", type=str, required=True, help="Train dataset path")
-parser.add_argument("--val", type=str, required=True, help="Validation dataset path")
-parser.add_argument("--logs", type=str, default="logs", help="Default log dir")
-parser.add_argument("--coco", type=str, default="mask1_rcnn_coco.h5", help="COCO weights path")
-parser.add_argument("--layers", type=str, default="heads", help="Which layers to train (heads, all)")
-parser.add_argument("--epochs", type=int, default=20, help="Number of epochs to learn")
+parser.add_argument("--train",  type=str, required=True,                help="Train dataset path"                 )
+parser.add_argument("--val",    type=str, required=True,                help="Validation dataset path"            )
+parser.add_argument("--logs",   type=str, default="logs",               help="Default log dir"                    )
+parser.add_argument("--coco",   type=str, default="mask1_rcnn_coco.h5", help="COCO weights path"                  )
+parser.add_argument("--layers", type=str, default="heads",              help="Which layers to train (heads, all)" )
+parser.add_argument("--epochs", type=int, default=20,                   help="Number of epochs to learn"          )
 args = parser.parse_args()
 
 DEFAULT_LOGS_DIR = args.logs
