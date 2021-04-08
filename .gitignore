@@ -2,6 +2,7 @@
 foodrecvenv/
 Mask_RCNN/
 dataset/
+dataset_*/
 .tool-versions
 .telegram
 telegram.json
