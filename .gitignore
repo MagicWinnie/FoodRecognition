@@ -1,0 +1,7 @@
+.vscode/
+foodrecvenv/
+Mask_RCNN/
+dataset/
+.tool-versions
+.telegram
+telegram.json
