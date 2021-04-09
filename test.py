@@ -39,9 +39,9 @@ config_ = InferenceConfig()
 config_.display()
 
 model = modellib.MaskRCNN(
-    mode      = 'inference', 
+    mode      = "inference", 
     config    = config_,
-    model_dir = '/content'
+    model_dir = "/content"
 )
 
 assert WEIGHTS_PATH != "", "Provide path to trained weights"
@@ -85,11 +85,11 @@ if args.val:
         print(r["masks"])
         visualize.display_instances(
             original_image,
-            r['rois'],
-            r['masks'],
-            r['class_ids'],
+            r["rois"],
+            r["masks"],
+            r["class_ids"],
             dataset.class_names,
-            r['scores'],
+            r["scores"],
             ax=fig.axes[-1],
             title="Predictions"
         )
@@ -109,11 +109,11 @@ else:
     
     visualize.display_instances(
         img,
-        r1['rois'],
-        r1['masks'],
-        r1['class_ids'],
+        r1["rois"],
+        r1["masks"],
+        r1["class_ids"],
         dataset.class_names,
-        r1['scores'],
+        r1["scores"],
         ax=ax,
         title="Predictions"
     )

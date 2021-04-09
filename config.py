@@ -74,11 +74,11 @@ class CustomDataset(utils.Dataset):
 
         # Register Images
         for _img_id in image_ids:
-            assert(os.path.exists(os.path.join(image_dir, self.coco.imgs[_img_id]['file_name'])))
+            assert(os.path.exists(os.path.join(image_dir, self.coco.imgs[_img_id]["file_name"])))
             self.add_image(
                 name,
                 image_id    = _img_id,
-                path        = os.path.join(image_dir, self.coco.imgs[_img_id]['file_name']),
+                path        = os.path.join(image_dir, self.coco.imgs[_img_id]["file_name"]),
                 width       = self.coco.imgs[_img_id]["width"],
                 height      = self.coco.imgs[_img_id]["height"],
                 annotations = self.coco.loadAnns(self.coco.getAnnIds(
@@ -116,7 +116,7 @@ class CustomDataset(utils.Dataset):
         # of class IDs that correspond to each channel of the mask.
         for annotation in annotations:
             class_id = self.map_source_class_id(
-                f"{name}.{annotation['category_id']}"
+                f"{name}.{annotation["category_id"]}"
             )
             if class_id:
                 m = self.annToMask(annotation, 
@@ -156,18 +156,18 @@ class CustomDataset(utils.Dataset):
         """ Convert annotation which can be polygons, uncompressed RLE to RLE.
         :return: binary mask (numpy 2D array)
         """
-        segm = ann['segmentation']
+        segm = ann["segmentation"]
         if isinstance(segm, list):
             # polygon -- a single object might consist of multiple parts
             # we merge all parts into one mask rle code
             rles = maskUtils.frPyObjects(segm, height, width)
             rle = maskUtils.merge(rles)
-        elif isinstance(segm['counts'], list):
+        elif isinstance(segm["counts"], list):
             # uncompressed RLE
             rle = maskUtils.frPyObjects(segm, height, width)
         else:
             # rle
-            rle = ann['segmentation']
+            rle = ann["segmentation"]
         return rle
 
     def annToMask(self, ann, height, width):
