@@ -23,7 +23,7 @@ class CustomConfig(Config):
 
     LEARNING_RATE    = 0.001
     IMAGES_PER_GPU   = 2
-    NUM_CLASSES      = 1 + 16  # Background + CLASSES
+    NUM_CLASSES      = 1 + 15  # Background + CLASSES
     STEPS_PER_EPOCH  = 150
     VALIDATION_STEPS = 50
     
@@ -34,7 +34,7 @@ class CustomConfig(Config):
 class InferenceConfig(config.__class__):
     GPU_COUNT                = 1
     IMAGES_PER_GPU           = 1
-    NUM_CLASSES              = 1 + 16 # Background + CLASSES
+    NUM_CLASSES              = 1 + 15 # Background + CLASSES
     DETECTION_MIN_CONFIDENCE = 0
 
     IMAGE_MAX_DIM            = 256
