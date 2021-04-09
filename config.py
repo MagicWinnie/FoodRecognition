@@ -6,39 +6,41 @@ import numpy as np
 import mrcnn
 import mrcnn.utils
 import mrcnn.config
-from mrcnn.config    import Config
-from mrcnn.model     import MaskRCNN
-from mrcnn           import model as modellib, utils
+from mrcnn.config import Config
+from mrcnn.model import MaskRCNN
+from mrcnn import model as modellib, utils
 from mrcnn.visualize import display_instances
 
-from pycocotools.coco     import COCO
+from pycocotools.coco import COCO
 from pycocotools.cocoeval import COCOeval
-from pycocotools          import mask as maskUtils
+from pycocotools import mask as maskUtils
 
 name = "foodrec"
 
-class CustomConfig(Config):
-    NAME             = name
-    BACKBONE         = "resnet50"
 
-    LEARNING_RATE    = 0.001
-    IMAGES_PER_GPU   = 2
-    NUM_CLASSES      = 1 + 15  # Background + CLASSES
-    STEPS_PER_EPOCH  = 150
+class CustomConfig(Config):
+    NAME = name
+    BACKBONE = "resnet50"
+
+    LEARNING_RATE = 0.001
+    IMAGES_PER_GPU = 2
+    NUM_CLASSES = 1 + 15  # Background + CLASSES
+    STEPS_PER_EPOCH = 150
     VALIDATION_STEPS = 50
-    
-    IMAGE_MAX_DIM    = 256
-    IMAGE_MIN_DIM    = 256
+
+    IMAGE_MAX_DIM = 256
+    IMAGE_MIN_DIM = 256
 
 
 class InferenceConfig(config.__class__):
-    GPU_COUNT                = 1
-    IMAGES_PER_GPU           = 1
-    NUM_CLASSES              = 1 + 15 # Background + CLASSES
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+    NUM_CLASSES = 1 + 15  # Background + CLASSES
     DETECTION_MIN_CONFIDENCE = 0
 
-    IMAGE_MAX_DIM            = 256
-    IMAGE_MIN_DIM            = 256
+    IMAGE_MAX_DIM = 256
+    IMAGE_MIN_DIM = 256
+
 
 class CustomDataset(utils.Dataset):
     def load_dataset(self, dataset_dir, load_small=False, return_coco=True):
@@ -50,7 +52,8 @@ class CustomDataset(utils.Dataset):
         """
         self.load_small = load_small
         if self.load_small:
-            annotation_path = os.path.join(dataset_dir, "annotation-small.json")
+            annotation_path = os.path.join(
+                dataset_dir, "annotation-small.json")
         else:
             annotation_path = os.path.join(dataset_dir, "annotations.json")
 
@@ -70,28 +73,31 @@ class CustomDataset(utils.Dataset):
 
         # register classes
         for _class_id in classIds:
-            self.add_class(name, _class_id, self.coco.loadCats(_class_id)[0]["name"])
+            self.add_class(name, _class_id,
+                           self.coco.loadCats(_class_id)[0]["name"])
 
         # Register Images
         for _img_id in image_ids:
-            assert(os.path.exists(os.path.join(image_dir, self.coco.imgs[_img_id]["file_name"])))
+            assert(os.path.exists(os.path.join(
+                image_dir, self.coco.imgs[_img_id]["file_name"])))
             self.add_image(
                 name,
-                image_id    = _img_id,
-                path        = os.path.join(image_dir, self.coco.imgs[_img_id]["file_name"]),
-                width       = self.coco.imgs[_img_id]["width"],
-                height      = self.coco.imgs[_img_id]["height"],
-                annotations = self.coco.loadAnns(self.coco.getAnnIds(
-                    imgIds  = [_img_id],
-                    catIds  = classIds,
-                    iscrowd = None
-                    )
+                image_id=_img_id,
+                path=os.path.join(
+                    image_dir, self.coco.imgs[_img_id]["file_name"]),
+                width=self.coco.imgs[_img_id]["width"],
+                height=self.coco.imgs[_img_id]["height"],
+                annotations=self.coco.loadAnns(self.coco.getAnnIds(
+                    imgIds=[_img_id],
+                    catIds=classIds,
+                    iscrowd=None
+                )
                 )
             )
 
         if return_coco:
             return self.coco
-            
+
     def load_mask(self, image_id):
         """ Loads instance mask for a given image
               This function converts mask from the coco format to a
@@ -119,11 +125,11 @@ class CustomDataset(utils.Dataset):
                 f"{name}.{annotation["category_id"]}"
             )
             if class_id:
-                m = self.annToMask(annotation, 
-                    image_info["height"],
-                    image_info["width"]
-                )
-                
+                m = self.annToMask(annotation,
+                                   image_info["height"],
+                                   image_info["width"]
+                                   )
+
                 # Some objects are so small that they're less than 1 pixel area
                 # and end up rounded out. Skip those objects.
                 if m.max() < 1:
