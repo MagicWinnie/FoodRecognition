@@ -118,7 +118,6 @@ else:
     print(len([img]))
     results = model.detect([img], verbose=1)
 
-    ax = get_ax(1)
     r1 = results[0]
 
     visualize.display_instances(
@@ -128,6 +127,5 @@ else:
         r1["class_ids"],
         dataset.class_names,
         r1["scores"],
-        ax=ax,
         title="Predictions"
     )

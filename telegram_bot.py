@@ -70,11 +70,13 @@ def get_ax(rows=1, cols=1, size=16):
     _, ax = plt.subplots(rows, cols, figsize=(size*cols, size*rows))
     return ax
 
+
 def random_colors(N, bright=True):
     brightness = 1.0 if bright else 0.7
     hsv = [(i / N, 1, brightness) for i in range(N)]
     colors = list(map(lambda c: colorsys.hsv_to_rgb(*c), hsv))
-    colors = list(map(lambda x: (255*int(x[-1]), 255*int(x[1]), 255*int(x[0])), colors))
+    colors = list(
+        map(lambda x: (255*int(x[-1]), 255*int(x[1]), 255*int(x[0])), colors))
     random.shuffle(colors)
     return colors
 
@@ -113,17 +115,20 @@ def display_instances(image, boxes, masks, class_ids, class_names,
         # Bounding box
         if (not np.any(boxes[i])) or scores[i] < 0.4:
             continue
-        
+
         y1, x1, y2, x2 = boxes[i]
-        
-        image = cv2.rectangle(image, (int(x1), int(y1)), (int(x2), int(y2)), color=color, thickness=2)
-        
+
+        image = cv2.rectangle(image, (int(x1), int(y1)),
+                              (int(x2), int(y2)), color=color, thickness=2)
 
         class_id = class_ids[i]
         score = scores[i] if scores is not None else None
         label = class_names[class_id]
         caption = "{} {:.3f}".format(label, score) if score else label
-        image = cv2.putText(image, caption, (int(x1), int(y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
+        image = cv2.rectangle(image, (int(x1), int(y1) - 40),
+                              (int(x2), int(y1) - 5), color=(0, 0, 0), thickness=-1)
+        image = cv2.putText(image, caption, (int(x1), int(
+            y1) - 10), cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 255))
 
         # Mask
         mask = masks[:, :, i]
@@ -143,7 +148,7 @@ def display_instances(image, boxes, masks, class_ids, class_names,
                 verts[i][0] = int(verts[i][0])
                 verts[i][1] = int(verts[i][1])
             verts = np.array(verts, np.int32)
-            verts = verts.reshape((-1,1,2))
+            verts = verts.reshape((-1, 1, 2))
             image = cv2.polylines(image, [verts], True, color, 3)
 
     return cv2.imencode('.jpg', image)[1]
@@ -174,7 +179,6 @@ def get_about(message):
 
 
 def send_photo(img, message):
-    # bot.send_chat_action(message.chat.id, 'upload_photo')
     bot.send_photo(message.chat.id, img,
                    reply_to_message_id=message.message_id)
 
@@ -185,7 +189,7 @@ def photo(message):
     fileID = message.photo[-1].file_id
     file_info = bot.get_file(fileID)
     downloaded_file = bot.download_file(file_info.file_path)
-    
+
     print("---STARTING DETECTION---")
     img = np.array(Image.open(io.BytesIO(downloaded_file)), dtype='uint8')
 
@@ -194,7 +198,7 @@ def photo(message):
     img = cv2.cvtColor(img, cv2.COLOR_RGB2BGR)
     try:
         send_photo(display_instances(img, r1['rois'], r1['masks'], r1['class_ids'],
-                                 classes, r1['scores'], ax=get_ax(1)), message)
+                                     classes, r1['scores'], ax=get_ax(1)), message)
     except:
         bot.send_message(message.chat.id, "Nothing found!")
 
