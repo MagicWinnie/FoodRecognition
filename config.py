@@ -23,39 +23,23 @@ class CustomConfig(Config):
     BACKBONE = "resnet50"
 
     LEARNING_RATE = 0.001
-    IMAGES_PER_GPU = 2
-    NUM_CLASSES = 1 + 15  # Background + CLASSES
+    IMAGES_PER_GPU = 1
+    NUM_CLASSES = 1 + 14  # Background + CLASSES
     STEPS_PER_EPOCH = 150
     VALIDATION_STEPS = 50
 
     IMAGE_MAX_DIM = 256
     IMAGE_MIN_DIM = 256
 
-
-class InferenceConfig(config.__class__):
-    GPU_COUNT = 1
-    IMAGES_PER_GPU = 1
-    NUM_CLASSES = 1 + 15  # Background + CLASSES
-    DETECTION_MIN_CONFIDENCE = 0
-
-    IMAGE_MAX_DIM = 256
-    IMAGE_MIN_DIM = 256
-
-
-class CustomDataset(utils.Dataset):
-    def load_dataset(self, dataset_dir, load_small=False, return_coco=True):
+class FoodDataset(utils.Dataset):
+    def load_dataset(self, dataset_dir, return_coco=True):
         """ Loads dataset
             Params:
                 - dataset_dir : root directory of the dataset (can point to the train/val folder)
                 - load_small : Boolean value which signals if the annotations for all the images need to be loaded into the memory,
                                or if only a small subset of the same should be loaded into memory
         """
-        self.load_small = load_small
-        if self.load_small:
-            annotation_path = os.path.join(
-                dataset_dir, "annotation-small.json")
-        else:
-            annotation_path = os.path.join(dataset_dir, "annotations.json")
+        annotation_path = os.path.join(dataset_dir, "annotations.json")
 
         image_dir = os.path.join(dataset_dir, "images")
         print("[INFO] Annotation Path ", annotation_path)
@@ -67,16 +51,17 @@ class CustomDataset(utils.Dataset):
 
         # Load all classes (Only Building in this version)
         classIds = self.coco.getCatIds()
-
+        
         # Load all images
         image_ids = list(self.coco.imgs.keys())
-
+        
         # register classes
         for _class_id in classIds:
             self.add_class(name, _class_id,
                            self.coco.loadCats(_class_id)[0]["name"])
 
         # Register Images
+        ctgs = []
         for _img_id in image_ids:
             assert(os.path.exists(os.path.join(
                 image_dir, self.coco.imgs[_img_id]["file_name"])))
@@ -94,6 +79,16 @@ class CustomDataset(utils.Dataset):
                 )
                 )
             )
+            temp = self.coco.loadAnns(self.coco.getAnnIds(
+                    imgIds=[_img_id],
+                    catIds=classIds,
+                    iscrowd=None
+                )
+                )
+            for i in range(len(temp)):
+                ctgs.append(temp[i]['category_id'])
+            # print(temp)
+        print(list(set(ctgs)))
 
         if return_coco:
             return self.coco
@@ -122,7 +117,7 @@ class CustomDataset(utils.Dataset):
         # of class IDs that correspond to each channel of the mask.
         for annotation in annotations:
             class_id = self.map_source_class_id(
-                f"{name}.{annotation["category_id"]}"
+                f"{name}.{annotation['category_id']}"
             )
             if class_id:
                 m = self.annToMask(annotation,
@@ -147,7 +142,7 @@ class CustomDataset(utils.Dataset):
             return mask, class_ids
         else:
             # Call super class to return an empty mask
-            return super(FoodChallengeDataset, self).load_mask(image_id)
+            return super(FoodDataset, self).load_mask(image_id)
 
     def image_reference(self, image_id):
         """ Return a reference for a particular image

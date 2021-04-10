@@ -10,7 +10,7 @@ import numpy as np
 
 import tensorflow as tf
 
-from config import CustomConfig, CustomDataset, InferenceConfig
+from config import CustomConfig, FoodDataset
 
 import matplotlib
 import matplotlib.pyplot as plt
@@ -39,6 +39,16 @@ MODEL_DIR = args.logs
 
 print("[INFO] Initializing configs...")
 config_ = CustomConfig()
+
+class InferenceConfig(config_.__class__):
+    GPU_COUNT = 1
+    IMAGES_PER_GPU = 1
+    NUM_CLASSES = 1 + 14  # Background + CLASSES
+    DETECTION_MIN_CONFIDENCE = 0
+
+    IMAGE_MAX_DIM = 256
+    IMAGE_MIN_DIM = 256
+
 config_ = InferenceConfig()
 config_.display()
 
@@ -54,7 +64,7 @@ print("[INFO] Loading weights from ", WEIGHTS_PATH)
 model.load_weights(WEIGHTS_PATH, by_name=True)
 
 print("[INFO] Initializing validation dataset...")
-dataset = CustomDataset()
+dataset = FoodDataset()
 dataset.load_dataset(args.path, load_small=False, return_coco=True)
 dataset.prepare()
 

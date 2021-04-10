@@ -1,8 +1,12 @@
+__pycache__/
 .vscode/
 foodrecvenv/
 Mask_RCNN/
 dataset/
 dataset_*/
+logs/
 .tool-versions
 .telegram
 telegram.json
+*.h5
+*.jpg

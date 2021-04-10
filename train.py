@@ -1,9 +1,12 @@
+import warnings
+warnings.simplefilter(action='ignore', category=FutureWarning)
+
 import os
 import argparse
 import numpy as np
 import keras.backend
 
-from config import CustomConfig, CustomDataset
+from config import CustomConfig, FoodDataset
 
 import mrcnn
 import mrcnn.utils
@@ -26,6 +29,8 @@ parser.add_argument("--epochs", type=int, default=20,
                     help="Number of epochs to learn")
 args = parser.parse_args()
 
+assert args.layers in ['heads', 'all']
+
 DEFAULT_LOGS_DIR = args.logs
 COCO_WEIGHTS_PATH = args.coco
 
@@ -35,8 +40,10 @@ if not os.path.exists(COCO_WEIGHTS_PATH):
 
 print("[INFO] Initializing configs...")
 config_ = CustomConfig()
+
 K = keras.backend.backend()
-keras.backend.common.image_dim_ordering()
+if K == 'tensorflow':
+    keras.backend.common.image_dim_ordering()
 model = modellib.MaskRCNN(
     mode="training",
     config=config_,
@@ -54,13 +61,13 @@ model.load_weights(
 )
 
 print("[INFO] Initializing train dataset...")
-dataset_train = CustomDataset()
-dataset_train.load_dataset(args.train, load_small=False)
+dataset_train = FoodDataset()
+temp = dataset_train.load_dataset(args.train, return_coco=True)
 dataset_train.prepare()
 
 print("[INFO] Initializing validation dataset...")
-dataset_val = CustomDataset()
-dataset_val.load_dataset(args.val, load_small=False, return_coco=True)
+dataset_val = FoodDataset()
+dataset_val.load_dataset(args.val, return_coco=True)
 dataset_val.prepare()
 
 print("[INFO] Starting training...")
@@ -70,3 +77,6 @@ model.train(
     epochs=args.epochs,
     layers=args.layers
 )
+print("[INFO] Done training")
+model_path = "mask_rcnn_food.h5"
+model.keras_model.save_weights(model_path)
