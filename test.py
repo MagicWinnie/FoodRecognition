@@ -24,14 +24,17 @@ from mrcnn.model import log
 from mrcnn.visualize import display_images
 
 parser = argparse.ArgumentParser()
-parser.add_argument("--logs",     type=str,
-                    default="logs", help="Default log dir")
-parser.add_argument("--val",      type=bool, default=True,
-                    help="Whether to use photos from validation dataset or own picture")
-parser.add_argument("--weights",  type=str,
-                    required=True,  help="Weights path")
-parser.add_argument("--path",     type=str,  required=True,
-                    help="Path to dataset or own picture")
+parser.add_argument("--logs", type=str, default="logs", help="Default log dir")
+parser.add_argument(
+    "--val",
+    type=bool,
+    default=True,
+    help="Whether to use photos from validation dataset or own picture",
+)
+parser.add_argument("--weights", type=str, required=True, help="Weights path")
+parser.add_argument(
+    "--path", type=str, required=True, help="Path to dataset or own picture"
+)
 args = parser.parse_args()
 
 WEIGHTS_PATH = args.weights
@@ -40,23 +43,21 @@ MODEL_DIR = args.logs
 print("[INFO] Initializing configs...")
 config_ = CustomConfig()
 
+
 class InferenceConfig(config_.__class__):
     GPU_COUNT = 1
     IMAGES_PER_GPU = 1
-    NUM_CLASSES = 1 + 14  # Background + CLASSES
+    NUM_CLASSES = 1 + 14  # Background + classes
     DETECTION_MIN_CONFIDENCE = 0
 
     IMAGE_MAX_DIM = 256
     IMAGE_MIN_DIM = 256
 
+
 config_ = InferenceConfig()
 config_.display()
 
-model = modellib.MaskRCNN(
-    mode="inference",
-    config=config_,
-    model_dir="/content"
-)
+model = modellib.MaskRCNN(mode="inference", config=config_, model_dir="/content")
 
 assert WEIGHTS_PATH != "", "Provide path to trained weights"
 
@@ -74,15 +75,15 @@ if args.val:
     for i in range(4):
         image_id = random.choice(dataset.image_ids)
 
-        original_image, image_meta, gt_class_id, gt_bbox, gt_mask =\
-            modellib.load_image_gt(
-                dataset,
-                config_,
-                image_id,
-                use_mini_mask=False
-            )
+        (
+            original_image,
+            image_meta,
+            gt_class_id,
+            gt_bbox,
+            gt_mask,
+        ) = modellib.load_image_gt(dataset, config_, image_id, use_mini_mask=False)
 
-        plt.subplot(6, 2, 2*i + 1)
+        plt.subplot(6, 2, 2 * i + 1)
 
         visualize.display_instances(
             original_image,
@@ -90,10 +91,10 @@ if args.val:
             gt_mask,
             gt_class_id,
             dataset.class_names,
-            ax=fig.axes[-1]
+            ax=fig.axes[-1],
         )
 
-        plt.subplot(6, 2, 2*i + 2)
+        plt.subplot(6, 2, 2 * i + 2)
         results = model.detect([original_image])  # , verbose=1)
         r = results[0]
         print(r["masks"])
@@ -105,9 +106,10 @@ if args.val:
             dataset.class_names,
             r["scores"],
             ax=fig.axes[-1],
-            title="Predictions"
+            title="Predictions",
         )
 else:
+
     def get_ax(rows=1, cols=1, size=16):
         _, ax = plt.subplots(rows, cols, figsize=(size * cols, size * rows))
         return ax
@@ -127,5 +129,5 @@ else:
         r1["class_ids"],
         dataset.class_names,
         r1["scores"],
-        title="Predictions"
+        title="Predictions",
     )
